@@ -6,16 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 
 <body>
     <div id="gameboard">
         <div class="dice_area" id=dicearea>
-            <div class="dice" id="die1" data-row="1"><img src="\public\design_system\dice1.png" class="img"></div>
-            <div class="dice" id="die2" data-row="2"><img src="\public\design_system\dice1.png" class="img"></div>
-            <div class="dice" id="die3" data-row="3"><img src="\public\design_system\dice1.png" class="img"></div>
-            <div class="dice" id="die4" data-row="4"><img src="\public\design_system\dice1.png" class="img"></div>
-            <div class="dice" id="die5" data-row="5"><img src="\public\design_system\dice1.png" class="img"></div>
+            <div class="dice" id="die1" data-row="1"><img src='dice1.png' class='img'></div>
+            <div class="dice" id="die2" data-row="2"><img src="dice1.png" class="img"></div>
+            <div class="dice" id="die3" data-row="3"><img src="dice1.png" class="img"></div>
+            <div class="dice" id="die4" data-row="4"><img src="dice1.png" class="img"></div>
+            <div class="dice" id="die5" data-row="5"><img src="dice1.png" class="img"></div>
         </div>
         <button id="rollButton" class="btn">ROLL</button>
 
@@ -89,19 +90,140 @@
     </table>
 
 
-    <script src="main.js">
+    <script type="text/javascript" >
+        
+        let scoreAvalibility = [0,0,0,0,0,0,0,0,0,0,0,0,0];
+        let diceAvalibility = [0,0,0,0,0];
+        var dice1 =diceAvalibility[0];
+        var dice2 =diceAvalibility[1];
+        var dice3 =diceAvalibility[2];
+        var dice4 =diceAvalibility[3];
+        var dice5 =diceAvalibility[4];
+        var dices = [];
+        const diceElements=document.querySelectorAll(".dice");  
+        const rollButton = document.getElementById("rollButton");
+        const cells=document.querySelectorAll("td");
+
+
+        diceElements.forEach(function(dice){
+        dice.addEventListener("click",onDiceClick);
+    });
+
+
+    cells.forEach(function(cell){
+        if (scoreAvalibility[cell.getAttribute("data-row")] === 0){
+          cell.addEventListener("click",onCellClick);}
+        
+      });
+
+
+
+    $(document).ready(function(){
+    $('#rollButton').click(function(){
+      $.ajax({
+        type:'POST',
+        url:'yatzyEngine.php',
+        
+        data: {status:0,dice1:diceAvalibility[0],dice2:diceAvalibility[1],dice3:diceAvalibility[2],dice4:diceAvalibility[3],dice5:diceAvalibility[4],},
+        error: function() {
+            alert("Error");
+        },
+        success: function() {
+            console.log(diceAvalibility);
+            console.log(scoreAvalibility);
+
+  }
+      });
+
+      $.get("yatzyEngine.php").done(function(data){
+        // console.log("`1212123")
+        
+    // What do I do with the data?
+    for (let i =0; i <5; i++){
+        dices[i] = data[i];
+
+    }
+    console.log(data);
+
+        console.log(dices);
+        changeDiceFaces(dices);
+    
+});
+    });
+   
+  });
+  function onCellClick(){
+  let row=this.getAttribute("data-row");
+
+    score[row]=parseInt(this.innerHTML);
+    console.log(score[row]);
+    scoreAvalibility[row]=1;
+    cells.forEach(function(cell){
+      cell.removeEventListener("click",onCellClick);
+    });
+    this.style.background="#7fb5da"; 
+    next();
+}
+
+        function onDiceClick(){
+        let num = this.getAttribute("data-row");
+        diceAvalibility[num-1]++;
+        diceAvalibility[num-1]=(diceAvalibility[num-1])%2;
+        console.log(diceAvalibility);
+        if (diceAvalibility[num-1]===0){
+              this.style.opacity=1; 
+        }
+         else{this.style.opacity=0.5; 
+
+          }
+
+}  
+        
+function changeDiceFaces(dice){
+  for (let i=0; i < diceElements.length;i++) {
+    
+    let face = document.getElementsByClassName("img")[i];
+    face.src="dice"+dice[i]+".png";
+    // console.log(face);
+  }
+  
+ }
+        
+       
+
+//         $(document).ready(function(){
+//         $('#rollButton').click(function(){
+//         console.log("Response: "+diceAvalibility+scoreAvalibility);
+//         $.ajax({
+//         type:'POST',
+//         url:'app\models\yatzyEngine.php',
+//         data:{
+//         diceAvalibility:$('#diceAvalibility').val(),
+//         scoreAvalibility:$('#scoreAvalibility').val(),
+//         },
+//         error: function() {
+//             alert("Error");
+//         },
+//         success: function() {
+//             alert("OK");
+//   }
+
+//       });
+//     });
+//   })
 
     </script>
 </body>
 
 </html>
+
 <?php
 require_once('config.php');
 
-require '/yatzy_php/app/models/dice.php';
+include "yatzyEngine.php";
+$d = array();
+$d = rollDice();
 
-
-for ($i = 1; $i <= 5; $i++) {
-    $x = roll();
-    echo "ROLL {$i}: {$x}<br>";
+for ($i=1; $i<=5; $i++) {
+  echo "ROLL {$i}: {$d[0]}<br>";
 }

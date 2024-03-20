@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 include "config.php";
 
 $rollCount = 0;
@@ -8,15 +10,8 @@ $diceAvalibility = array();
 $scoreAvalibility = array(0,0,0,0,0,0,0,0,0,0,0,0,0);
 $status = $_REQUEST['status'];
 $dices = array(1,2,3,4,5);
+$previousDice= array();
 if ($status==0){
-
-// for ($i = 0; $i < 5; $i++) {
-//     echo json_encode($dices[$i]);
-//     // echo json_encode($dice1);
-
-// }
-}
-$rollCount++;
 $dice1 = $_REQUEST['dice1'];
 $dice2 = $_REQUEST['dice2'];
 $dice3 = $_REQUEST['dice3'];
@@ -27,60 +22,71 @@ $diceAvalibility[1]=(int)$dice2;
 $diceAvalibility[2]=(int)$dice3;
 $diceAvalibility[3]=(int)$dice4;
 $diceAvalibility[4]=(int)$dice5;
-$rollCount++;
+rollDice();
+ 
     for ($i = 0; $i < 5; $i++) {
-        if ($diceAvalibility[$i] === 0) {
-            $dices[$i] = (rand(1, 6));
+
             echo json_encode($dices[$i]);
-        }
+
     }
 
-// if (isset($_POST["array"])) {
-//     $diceAvalibility = $_POST["array"];
-//     echo json_encode("sdiceAvaibla");
+// for ($i = 0; $i < 5; $i++) {
+//     echo json_encode($dices[$i]);
+//     // echo json_encode($dice1);
+
+// }
+}
+elseif($status == 1){
+    $dice1 = $_REQUEST['num1'];
+    $dice2 = $_REQUEST['num2'];
+    $dice3 = $_REQUEST['num3'];
+    $dice4 = $_REQUEST['num4'];
+    $dice5 = $_REQUEST['num5'];
+    $previousDice[0]=(int)$dice1;
+    $previousDice[1]=(int)$dice2;
+    $previousDice[2]=(int)$dice3;
+    $previousDice[3]=(int)$dice4;
+    $previousDice[4]=(int)$dice5;
+    for ($i = 0; $i < 5; $i++) {
+
+        echo json_encode($previousDice[$i]);echo " ";
+
+}
+
+writeScore($previousDice);
+
+
+
+
+
+
+}
+if($status==3){
+    $x = $_REQUEST['variable'];
+    $y = (int)$x;
+if (empty($_SESSION["res"])) {
+    $_SESSION["res"]=[0,0,0,0,0,0,0,0,0,0]; 
+ } else {
+    if($x>$_SESSION["res"][9]){
+        unset($_SESSION["res"][9]);
+        array_push($_SESSION["res"], $x);
+        arsort($_SESSION["res"]);
+        
+
+    }
+    
+    print_r($_SESSION["res"]);
+ }
+}
+
+// if (isset($_REQUEST["array"])) {
+//     $diceAvalibility = $_REQUEST["array"];
+    // echo json_encode("sdiceAvaibla");
  
 
 // }
 
-// if ($scoreAvalibility[0] === 0) {
-//     echo json_encode(calculateOnes($dices));
-//          }
-//          if ($scoreAvalibility[1] === 0) {
-//             echo json_encode(calculateTwos($dices));
-//         }
-//         if ($scoreAvalibility[2] === 0) {
-//             echo json_encode(calculateThrees($dices));
-//         }
-//          if ($scoreAvalibility[3] === 0) {
-//             echo json_encode(calculateFours($dices));
-//         }
-//         if ($scoreAvalibility[4] === 0) {
-//                     echo json_encode(calculateFives($dices));
-//                 }
-//          if ($scoreAvalibility[5] === 0) {
-//             echo json_encode(calculateSixes($dices));
-//         }
-//         if ($scoreAvalibility[6] === 0) {
-//             echo json_encode(calculateThreeOfAKind($dices));
-//         }
-//         if ($scoreAvalibility[7] === 0) {
-//             echo json_encode(calculateFourOfAKind($dices));
-//         }
-//         if ($scoreAvalibility[8] === 0) {
-//             echo json_encode(calculateFullHouse($dices));
-//         }
-//         if ($scoreAvalibility[9] === 0) {
-//             echo json_encode(calculateSmallStraight($dices));
-//         }
-// if ($scoreAvalibility[10] === 0) {
-//     echo json_encode(calculateLargeStraight($dices));
-// }
-// if ($scoreAvalibility[11] === 0) {
-//     echo json_encode(calculateChance($dices));
-// }
-// if ($scoreAvalibility[12] === 0) {
-//     echo json_encode(calculateYahtzee($dices));
-// }
+
 
 // echo json_encode(calculateOnes($dice));
 // echo json_encode(calculateTwos($dice));
@@ -98,25 +104,74 @@ $rollCount++;
 
 
 
+function writeScore($dices){
+    global $scoreAvalibility;
+    if ($scoreAvalibility[0] == 0) {
+        echo json_encode(calculateOnes($dices));
+        echo " ";
+             }
+             if ($scoreAvalibility[1] == 0) {
+                echo json_encode(calculateTwos($dices));
+                echo " ";
+            }
+            if ($scoreAvalibility[2] == 0) {
+                echo json_encode(calculateThrees($dices));echo " ";
+            }
+             if ($scoreAvalibility[3] == 0) {
+                echo json_encode(calculateFours($dices));echo " ";
+            }
+            if ($scoreAvalibility[4] == 0) {
+                        echo json_encode(calculateFives($dices));echo " ";
+                    }
+             if ($scoreAvalibility[5] == 0) {
+                echo json_encode(calculateSixes($dices));echo " ";
+            }
+            if ($scoreAvalibility[6] == 0) {
+                echo json_encode(calculateThreeOfAKind($dices));echo " ";
+            }
+            if ($scoreAvalibility[7] == 0) {
+                echo json_encode(calculateFourOfAKind($dices));echo " ";
+            }
+            if ($scoreAvalibility[8] == 0) {
+                echo json_encode(calculateFullHouse($dices));echo " ";
+            }
+            if ($scoreAvalibility[9] == 0) {
+                echo json_encode(calculateSmallStraight($dices));echo " ";
+            }
+    if ($scoreAvalibility[10] == 0) {
+        echo json_encode(calculateLargeStraight($dices));echo " ";
+    }
+    if ($scoreAvalibility[11] == 0) {
+        echo json_encode(calculateChance($dices));echo " ";
+    }
+    if ($scoreAvalibility[12] == 0) {
+        echo json_encode(calculateYahtzee($dices));echo " ";
+    }
+    
 
+}
 function rollDice()
 {
     global $rollCount, $dices, $diceAvalibility ;
-    $rollCount++;
     // for ($i = 0; $i < 13; $i++) {
     //     array_push($scoreAvalibility, 0);
     // }
+    $rollCount++;
     for ($i = 0; $i < 5; $i++) {
         if ($diceAvalibility[$i] === 0) {
             $dices[$i] = (rand(1, 6));
         }
+        // else{
+        //      $dices[$i] = (rand(1, 6));
+        // }
     }
+
     // foreach ($diceElements as $dice) {
     //     $dice.addEventListener("click", onDiceClick);
     // }
     // changeDiceFaces($dices);
     // writeScore($dices);
-    return $dices;
+    
     // if ($rollCount == 3) {
     //     $rollButton.disabled = true;
     //     $rollButton.style.opacity = 0.5;

@@ -35,15 +35,17 @@ body {background-color: rgb(212, 196, 190);}
     width: 100%;
 }
 
+
 table {
     border: solid 2px #333;
     border-collapse: collapse;
+    width: 10%;
   }
 
 td{
     border: solid 2px #333;
     width: 45px;
-    height: 10px;
+    height: 30px;
     
 
 }
